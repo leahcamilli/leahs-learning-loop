@@ -1,0 +1,84 @@
+name: Publish a lesson
+on:
+  workflow_dispatch:
+    inputs:
+      recording_json:
+        description: Recording JSON copied from the site's Publish recording dialog. Content becomes public.
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  publish:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate recording and add it to the public library
+        env:
+          RECORDING_JSON: ${{ inputs.recording_json }}
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from datetime import datetime
+          from pathlib import Path
+          from urllib.parse import parse_qs, urlparse
+          try:
+              raw = os.environ["RECORDING_JSON"]
+              if len(raw) > 65535:
+                  raise ValueError("JSON exceeds GitHub's manual workflow input limit.")
+              item = json.loads(raw)
+              if not isinstance(item, dict):
+                  raise ValueError("Recording must be a JSON object.")
+              url = urlparse(item.get("url", ""))
+              if url.scheme != "https" or url.port is not None or url.username or url.password or url.hostname not in {"youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"}:
+                  raise ValueError("Use a standard HTTPS YouTube watch, share, live, or Shorts URL.")
+              if url.hostname == "youtu.be":
+                  video_id = url.path.strip("/").split("/")[0]
+              elif url.path == "/watch":
+                  video_id = parse_qs(url.query).get("v", [""])[0]
+              else:
+                  parts = url.path.split("/")
+                  video_id = parts[2] if len(parts) > 2 and parts[1] in {"embed", "shorts", "live"} else ""
+              if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+                  raise ValueError("A valid 11-character YouTube video ID is required.")
+              if not isinstance(item.get("title"), str) or not item["title"].strip() or len(item["title"]) > 200:
+                  raise ValueError("Title must contain 1–200 characters.")
+              categories = {"discovery", "engineering", "rag", "agents", "evaluation", "delivery"}
+              if item.get("category") not in categories:
+                  raise ValueError("Select one of the six roadmap categories.")
+              minutes = item.get("minutes", 0)
+              if isinstance(minutes, bool) or not isinstance(minutes, int) or not 0 <= minutes <= 1440:
+                  raise ValueError("Duration must be a whole number from 0 to 1440 minutes.")
+              fields = {"summary": 2000, "transcript": 45000}
+              for name, limit in fields.items():
+                  if not isinstance(item.get(name, ""), str) or len(item.get(name, "")) > limit:
+                      raise ValueError(f"{name} must be text no longer than {limit} characters.")
+              takeaways = item.get("takeaways", [])
+              if not isinstance(takeaways, list) or len(takeaways) > 30 or any(not isinstance(x, str) or not x.strip() or len(x) > 2000 for x in takeaways):
+                  raise ValueError("Takeaways must be a list of up to 30 nonempty strings, no more than 2,000 characters each.")
+              if not (item.get("transcript", "").strip() or item.get("summary", "").strip() or takeaways):
+                  raise ValueError("Add a transcript, summary, or takeaway before publishing.")
+              created = item.get("created")
+              if not isinstance(created, str) or not created or len(created) > 40 or datetime.fromisoformat(created.replace("Z", "+00:00")).tzinfo is None:
+                  raise ValueError("Created must be an ISO-8601 datetime with a timezone.")
+              item = {"id": video_id, "url": f"https://www.youtube.com/watch?v={video_id}", "title": item["title"].strip(), "category": item["category"], "minutes": minutes, "summary": item.get("summary", "").strip(), "takeaways": [x.strip() for x in takeaways], "transcript": item.get("transcript", "").strip(), "created": created}
+              path = Path("data/recordings.json")
+              records = json.loads(path.read_text(encoding="utf-8"))
+              if not isinstance(records, list) or len(records) >= 500:
+                  raise ValueError("Published recording library is full or invalid.")
+              if any(record.get("id") == video_id for record in records):
+                  raise ValueError("This video ID already exists. Edit its JSON file through a reviewed repository change.")
+              path.write_text(json.dumps([item, *records], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          except (ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
+              raise SystemExit(f"Recording was not published: {error}")
+          PY
+      - name: Commit the verified lesson
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/recordings.json
+          git diff --cached --quiet && { echo "No library changes were made."; exit 1; }
+          git commit -m "Publish verified YouTube lesson"
+          git push

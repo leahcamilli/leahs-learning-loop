@@ -1,0 +1,528 @@
+[
+  {
+    "id": "discovery",
+    "title": "Find the real problem",
+    "tag": "Discovery & product",
+    "outcome": "Turn an ambiguous customer request into a measurable, responsible AI use case.",
+    "topics": [
+      "Customer interviews",
+      "Workflow mapping",
+      "Success metrics",
+      "AI suitability"
+    ],
+    "tasks": [
+      "Map a user workflow, its friction, and the people affected.",
+      "Write a problem brief with a non-AI baseline, measurable outcome, and reason to stop the experiment."
+    ],
+    "project": "Talk to a willing user about a routine task. Map the process and propose a narrow experiment with a measurable outcome.",
+    "sources": [
+      {
+        "title": "Google PAIR: People + AI Guidebook",
+        "url": "https://pair.withgoogle.com/guidebook/"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "A stakeholder asks for a chatbot. What comes first?",
+        "o": [
+          "Choose the largest model.",
+          "Understand the user, workflow, pain, and outcome.",
+          "Build a chat UI before user research.",
+          "Count tokens generated."
+        ],
+        "a": 1,
+        "why": "Start with the user's workflow and the outcome to improve, not a presumed solution.",
+        "source": 0
+      },
+      {
+        "q": "Which is the strongest prototype criterion?",
+        "o": [
+          "The demo looks impressive.",
+          "The model writes long answers.",
+          "Representative tests show faster review without more critical errors.",
+          "Stakeholders like the AI strategy."
+        ],
+        "a": 2,
+        "why": "Define an observable improvement, a baseline, and a quality constraint. Specify a measurable target with the customer.",
+        "source": 0
+      },
+      {
+        "q": "Required customer data is not authorized. What next?",
+        "o": [
+          "Treat permissions as a constraint; change scope or stop.",
+          "Use it in a public demo.",
+          "Ignore the issue until production.",
+          "Use a larger model."
+        ],
+        "a": 0,
+        "why": "Data rights constrain feasibility; prototyping does not remove this responsibility.",
+        "source": 0
+      },
+      {
+        "q": "The team measures prototype value by model response speed. What is missing?",
+        "o": [
+          "A user outcome and a baseline to compare against.",
+          "More model metrics only.",
+          "A new interface.",
+          "Longer answers."
+        ],
+        "a": 0,
+        "why": "Technical latency alone does not establish that the user's task improved; choose an outcome and baseline.",
+        "source": 0
+      },
+      {
+        "q": "Stakeholder opinions conflict with user observations. What is a useful next step?",
+        "o": [
+          "Write down assumptions, investigate the workflow with users, and test the riskiest hypothesis.",
+          "Pick the loudest opinion.",
+          "Expand the scope.",
+          "Skip discovery."
+        ],
+        "a": 0,
+        "why": "Surface assumptions and collect relevant user evidence before committing to a solution.",
+        "source": 0
+      }
+    ]
+  },
+  {
+    "id": "engineering",
+    "title": "Build the integration backbone",
+    "tag": "Python, APIs & data",
+    "outcome": "Build tested services that connect models to data and real customer workflows.",
+    "topics": [
+      "Python",
+      "HTTP APIs",
+      "SQL & data contracts",
+      "Testing & reliability"
+    ],
+    "tasks": [
+      "Build an API that validates inputs, handles errors explicitly, and has automated tests.",
+      "Ingest public data with a documented schema, provenance, and duplicate handling."
+    ],
+    "project": "Load a public dataset into a small database and expose a paginated, tested API. Document your schema and an example error response.",
+    "sources": [
+      {
+        "title": "Python tutorial",
+        "url": "https://docs.python.org/3/tutorial/"
+      },
+      {
+        "title": "FastAPI tutorial",
+        "url": "https://fastapi.tiangolo.com/tutorial/"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "A client sends invalid input to your API. What should happen?",
+        "o": [
+          "Silently replace it with a default.",
+          "Crash without an explanation.",
+          "Return a documented validation error with actionable detail.",
+          "Retry forever."
+        ],
+        "a": 2,
+        "why": "Explicit errors distinguish invalid requests from successful operations.",
+        "source": 1
+      },
+      {
+        "q": "Why validate data with a schema at an API boundary?",
+        "o": [
+          "It proves the business problem is solved.",
+          "It makes the contract explicit and catches malformed input early.",
+          "It replaces tests.",
+          "It encrypts the database."
+        ],
+        "a": 1,
+        "why": "Validation enforces an explicit input contract; it does not replace tests or solve the business problem.",
+        "source": 1
+      },
+      {
+        "q": "How do you test that an API rejects a missing required field?",
+        "o": [
+          "Only check the server starts.",
+          "Read the API documentation.",
+          "Send an invalid request and assert its validation response.",
+          "Avoid calling the endpoint."
+        ],
+        "a": 2,
+        "why": "Test actual invalid requests and assert the documented status and error shape.",
+        "source": 1
+      },
+      {
+        "q": "An ingestion job may retry after a network failure. Which design helps avoid duplicates?",
+        "o": [
+          "Assign stable record identities and make writes idempotent.",
+          "Delete all existing records first.",
+          "Ignore responses.",
+          "Retry without limit."
+        ],
+        "a": 0,
+        "why": "Idempotent operations can be retried safely without creating duplicate records.",
+        "source": 1
+      },
+      {
+        "q": "A paginated API omits some records only when a client follows several pages. What should you test?",
+        "o": [
+          "Only the landing page.",
+          "Pagination boundaries, ordering, and continuation behavior across multiple requests.",
+          "The favicon.",
+          "Only the database connection."
+        ],
+        "a": 1,
+        "why": "Test the actual multi-request contract and boundary cases, not just the first page.",
+        "source": 1
+      }
+    ]
+  },
+  {
+    "id": "rag",
+    "title": "Ground AI in useful knowledge",
+    "tag": "LLMs & retrieval",
+    "outcome": "Build a retrieval-augmented assistant with inspectable evidence and visible limitations.",
+    "topics": [
+      "Model APIs",
+      "Embeddings",
+      "Chunking & retrieval",
+      "Grounding & citations"
+    ],
+    "tasks": [
+      "Build a retrieval-augmented prototype using sources you have permission to use; show your citations.",
+      "Test answerable and unanswerable questions; distinguish retrieval misses from generation errors."
+    ],
+    "project": "Build a documentation assistant for a public project. Show retrieved evidence, cite the source, and flag unanswerable questions.",
+    "sources": [
+      {
+        "title": "Microsoft: RAG overview",
+        "url": "https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "What does retrieval contribute to RAG?",
+        "o": [
+          "It replaces model parameters.",
+          "It supplies relevant external evidence as context.",
+          "It guarantees every generated claim is true.",
+          "It eliminates source maintenance."
+        ],
+        "a": 1,
+        "why": "Retrieval provides context; grounding does not guarantee correctness.",
+        "source": 0
+      },
+      {
+        "q": "The relevant document never appears in context. What do you investigate first?",
+        "o": [
+          "Chat window color.",
+          "Only final answer wording.",
+          "Indexing, chunking, queries, and ranking.",
+          "Answer length."
+        ],
+        "a": 2,
+        "why": "Diagnose missing evidence in the retrieval pipeline separately from generation quality.",
+        "source": 0
+      },
+      {
+        "q": "The source collection cannot answer a question. What should the assistant do?",
+        "o": [
+          "Invent a citation.",
+          "Make the evidence gap clear.",
+          "Use any nearby passage regardless of relevance.",
+          "Claim the collection is complete."
+        ],
+        "a": 1,
+        "why": "Make evidence limits visible; a nearby excerpt may not support the claim.",
+        "source": 0
+      },
+      {
+        "q": "A retrieved chunk contains useful facts but no source identifier. What should you improve?",
+        "o": [
+          "Preserve source metadata through retrieval so an answer can cite its evidence.",
+          "Hide all citations.",
+          "Generate a source title using the model.",
+          "Increase answer length."
+        ],
+        "a": 0,
+        "why": "Keep source provenance attached to retrieved passages so users can inspect actual evidence.",
+        "source": 0
+      },
+      {
+        "q": "Your test answers cite the right documents but still miss the answer. What should you inspect?",
+        "o": [
+          "Whether retrieved passages contain enough relevant detail and whether the question needs multiple sources.",
+          "Only the model's color scheme.",
+          "The number of emojis.",
+          "Whether citations are clickable."
+        ],
+        "a": 0,
+        "why": "Relevant source identity is not sufficient if retrieval returns incomplete evidence; inspect the content and context.",
+        "source": 0
+      }
+    ]
+  },
+  {
+    "id": "agents",
+    "title": "Turn reasoning into safe action",
+    "tag": "Agents & tool use",
+    "outcome": "Give AI tools clear limits, least-privilege permissions, and human checkpoints.",
+    "topics": [
+      "Tool calling",
+      "Workflow orchestration",
+      "MCP",
+      "Human approval"
+    ],
+    "tasks": [
+      "Implement a narrowly scoped tool with typed inputs and independent server-side authorization.",
+      "Require human confirmation before consequential actions and test a safe failure path."
+    ],
+    "project": "Build an assistant that drafts a service request using dummy data. Let a human approve submission and record each tool action.",
+    "sources": [
+      {
+        "title": "MCP: Tools",
+        "url": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"
+      },
+      {
+        "title": "OWASP: Excessive Agency",
+        "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "A model requests a tool action. Where is authorization enforced?",
+        "o": [
+          "Only in the prompt.",
+          "Only by hiding a button.",
+          "At the server-side tool boundary using the caller's permissions.",
+          "Nowhere; requests are trusted."
+        ],
+        "a": 2,
+        "why": "A model-requested action is not authorization. The tool enforces permissions independently.",
+        "source": 1
+      },
+      {
+        "q": "What is the safer default for an agent that can delete records?",
+        "o": [
+          "Unrestricted demo access.",
+          "Least privilege and explicit approval for destructive actions.",
+          "A prompt saying be careful.",
+          "No logging."
+        ],
+        "a": 1,
+        "why": "Constrain tool functionality and permissions; use human oversight for high-impact operations.",
+        "source": 1
+      },
+      {
+        "q": "What does a structured tool schema guarantee?",
+        "o": [
+          "Expected input shape, not that every call is authorized.",
+          "Exemption from validation.",
+          "The model always picks the right tool.",
+          "No need for oversight."
+        ],
+        "a": 0,
+        "why": "Schemas describe an interface; validation, authorization, and oversight remain important.",
+        "source": 0
+      },
+      {
+        "q": "A tool request contains an unexpected extra field. What is the safe handling?",
+        "o": [
+          "Validate the schema and reject unsupported input before execution.",
+          "Execute it anyway.",
+          "Assume the model authorized it.",
+          "Disable authentication."
+        ],
+        "a": 0,
+        "why": "Validate tool input at the trusted boundary, regardless of which client proposed it.",
+        "source": 0
+      },
+      {
+        "q": "An agent is asked to send an external message. What is a useful safety checkpoint?",
+        "o": [
+          "Send it immediately using broad account access.",
+          "Present the proposed message and recipient for confirmation before sending.",
+          "Log out the user.",
+          "Skip the preview."
+        ],
+        "a": 1,
+        "why": "Confirm important external side effects with a human, and limit the tool to necessary permissions.",
+        "source": 1
+      }
+    ]
+  },
+  {
+    "id": "evaluation",
+    "title": "Measure quality, not vibes",
+    "tag": "Evaluation & safety",
+    "outcome": "Find regressions and make responsible release decisions with representative tests.",
+    "topics": [
+      "Evaluation datasets",
+      "Task-specific metrics",
+      "Adversarial testing",
+      "Cost & latency"
+    ],
+    "tasks": [
+      "Create a versioned test set with realistic tasks, edge cases, expected behavior, and failure modes.",
+      "Compare versions on quality, critical failures, latency, and cost; document your release decision."
+    ],
+    "project": "Build an evaluation harness for your assistant. Include a failure that a polished demo would hide.",
+    "sources": [
+      {
+        "title": "OpenAI: Evaluation best practices",
+        "url": "https://platform.openai.com/docs/guides/evaluation-best-practices"
+      },
+      {
+        "title": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "Which evaluation set is useful before release?",
+        "o": [
+          "Only demo questions.",
+          "Representative tasks, edge cases, and failures with explicit scoring criteria.",
+          "One easy question.",
+          "Unscored random prompts."
+        ],
+        "a": 1,
+        "why": "Represent intended tasks and relevant risks, scored against explicit criteria.",
+        "source": 0
+      },
+      {
+        "q": "You tuned on every test question. What is the concern?",
+        "o": [
+          "The score may overestimate performance on new requests; reserve independent examples.",
+          "Tuning prevents overfitting.",
+          "Tuning proves generalization.",
+          "Versioning is unnecessary."
+        ],
+        "a": 0,
+        "why": "Keep a genuinely independent evaluation set to estimate performance beyond training or tuning examples.",
+        "source": 0
+      },
+      {
+        "q": "A new version improves average quality but has a critical unsafe failure. What now?",
+        "o": [
+          "Release because the average improved.",
+          "Remove the example from the report.",
+          "Investigate the risk and gate the release against the documented safety criteria.",
+          "Report latency only."
+        ],
+        "a": 2,
+        "why": "An aggregate improvement cannot erase a critical risk; apply the documented release gates.",
+        "source": 1
+      },
+      {
+        "q": "A model upgrade changes the output format. What should you do before release?",
+        "o": [
+          "Rerun the versioned evaluation, including schema and integration checks.",
+          "Assume the API contract is unchanged.",
+          "Remove schema tests.",
+          "Evaluate only cost."
+        ],
+        "a": 0,
+        "why": "Evaluate behavioral and integration regressions when changing models; record the versions and outcomes.",
+        "source": 0
+      },
+      {
+        "q": "A single average score hides rare but serious failures. What helps?",
+        "o": [
+          "Slice results by failure type and severity and define release gates.",
+          "Report only the average.",
+          "Drop failures from the dataset.",
+          "Increase output length."
+        ],
+        "a": 0,
+        "why": "Break down results so an aggregate does not conceal failures that matter to users.",
+        "source": 1
+      }
+    ]
+  },
+  {
+    "id": "delivery",
+    "title": "Ship, observe, and hand over",
+    "tag": "Deployment & delivery",
+    "outcome": "Deliver a maintainable service with useful observability, rollback, and a clear handoff.",
+    "topics": [
+      "CI/CD",
+      "Observability",
+      "Reliability & rollback",
+      "Adoption & handoff"
+    ],
+    "tasks": [
+      "Deploy a service with secret-free source, health checks, and actionable error telemetry.",
+      "Write a runbook with an owner, rollback steps, evaluation results, and customer acceptance criteria."
+    ],
+    "project": "Ship your prototype to a test audience. Demonstrate failure and recovery, then hand over the operating instructions.",
+    "sources": [
+      {
+        "title": "Google Cloud: MLOps",
+        "url": "https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+      },
+      {
+        "title": "OpenTelemetry: Observability primer",
+        "url": "https://opentelemetry.io/docs/concepts/observability-primer/"
+      }
+    ],
+    "quiz": [
+      {
+        "q": "Which telemetry helps diagnose failures across an AI request with several steps?",
+        "o": [
+          "A weekly user count.",
+          "Correlated traces, errors, and latency for model, retrieval, and tool steps.",
+          "Successful-response screenshots.",
+          "No telemetry."
+        ],
+        "a": 1,
+        "why": "Correlated signals help locate failures across a workflow. Avoid logging sensitive inputs unnecessarily.",
+        "source": 1
+      },
+      {
+        "q": "Where should a deployed service keep API keys?",
+        "o": [
+          "In the browser's JavaScript bundle.",
+          "In a committed notebook.",
+          "In protected runtime configuration, never client-delivered code.",
+          "In a public README."
+        ],
+        "a": 2,
+        "why": "Client code is public. Protect runtime credentials in an appropriate secrets store.",
+        "source": 0
+      },
+      {
+        "q": "What completes an operational handoff?",
+        "o": [
+          "Only a demo link.",
+          "An operator, runbook, monitoring, rollback procedure, and acceptance criteria.",
+          "A promise AI never fails.",
+          "A presentation."
+        ],
+        "a": 1,
+        "why": "A demo is not an operating model; include people, observability, recovery, and acceptance criteria.",
+        "source": 0
+      },
+      {
+        "q": "An AI feature starts producing more errors after deployment. Which response is most operationally useful?",
+        "o": [
+          "Inspect relevant error traces, alert the owner, and use the runbook to mitigate or roll back.",
+          "Delete all monitoring.",
+          "Wait for a customer to complain.",
+          "Publish secrets to debug faster."
+        ],
+        "a": 0,
+        "why": "Use observable signals, a named owner, and an established mitigation or rollback procedure.",
+        "source": 1
+      },
+      {
+        "q": "Who should own a deployed customer workflow after launch?",
+        "o": [
+          "Nobody; deployment means the work is finished.",
+          "A named operator with a runbook, monitoring, and clear customer acceptance criteria.",
+          "Only the model provider.",
+          "The public."
+        ],
+        "a": 1,
+        "why": "Production delivery needs ownership, support procedures, and agreement on acceptance outcomes.",
+        "source": 0
+      }
+    ]
+  }
+]
